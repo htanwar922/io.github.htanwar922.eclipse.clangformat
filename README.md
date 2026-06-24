@@ -170,11 +170,22 @@ Toggling again on any of the above restores the original text exactly
 ### `.clang-format` existence check
 
 If the configured arguments use (or default to) `-style=file`, the
-plug-in first searches for a governing `.clang-format`, walking up from
-the edited file's own directory through every parent directory, up to
-and including the Eclipse workspace root. If none is found anywhere in
-that chain, **nothing is formatted** - you get a warning dialog instead,
-so you don't end up with a huge diff from an unintended fallback style.
+plug-in searches for a governing `.clang-format` before changing
+anything, in this order:
+
+1. the edited file's own directory, then every parent directory above
+   it (this naturally passes through the project folder in the normal
+   case);
+2. the file's **project base directory**, checked explicitly even if
+   step 1 didn't reach it (e.g. the file is a linked resource living
+   outside the project's real location on disk);
+3. the **workspace root**, checked explicitly even if the project
+   itself lives outside the workspace (an external project location).
+
+The first `.clang-format` found anywhere in that chain wins. If none is
+found at all, **nothing is formatted** - you get a warning dialog
+instead, so you don't end up with a huge diff from an unintended
+fallback style.
 
 Once found, the plug-in rewrites the args to `-style=file:<absolute
 path>` before invoking clang-format, and also runs the process with its

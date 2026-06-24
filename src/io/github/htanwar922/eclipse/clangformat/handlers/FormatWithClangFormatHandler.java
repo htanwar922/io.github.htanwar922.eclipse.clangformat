@@ -6,6 +6,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
@@ -98,21 +99,26 @@ public class FormatWithClangFormatHandler extends AbstractHandler {
         File workspaceRootDir = (wsRoot.getLocation() != null) ? wsRoot.getLocation().toFile() : null;
 
         File startDir = workspaceRootDir;
+        File projectDir = null;
         IFile workspaceFile = input.getAdapter(IFile.class);
         if (workspaceFile != null) {
             IPath location = workspaceFile.getLocation();
             if (location != null) {
                 startDir = location.toFile().getParentFile();
             }
+            IProject project = workspaceFile.getProject();
+            if (project != null && project.getLocation() != null) {
+                projectDir = project.getLocation().toFile();
+            }
         }
 
         if (ClangFormatStyleResolver.usesFileStyle(extraArgs)) {
-            File clangFormatFile = ClangFormatStyleResolver.findClangFormatFile(startDir, workspaceRootDir);
+            File clangFormatFile = ClangFormatStyleResolver.findClangFormatFile(startDir, projectDir, workspaceRootDir);
             if (clangFormatFile == null) {
                 MessageDialog.openWarning(Display.getDefault().getActiveShell(),
                         "No .clang-format File Found",
                         "No .clang-format file was found in this file's directory, any parent "
-                                + "directory, or the workspace root.\n\n"
+                                + "directory, the project's base directory, or the workspace root.\n\n"
                                 + "Formatting was skipped to avoid applying an unintended default "
                                 + "style. Add a .clang-format file, or set an explicit style "
                                 + "(e.g. -style=LLVM) under Window > Preferences > Clang-Format > "

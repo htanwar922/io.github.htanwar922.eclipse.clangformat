@@ -7,11 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Locates the ".clang-format" file that governs a source file, by walking
- * up from the file's own directory through every parent, up to and
- * including the Eclipse workspace root - the same nearest-wins search
- * clang-format itself does for "-style=file", but resolved explicitly so
- * it doesn't depend on the spawned process's working directory.
+ * Locates the ".clang-format" file that governs a source file. Search
+ * order: the file's own directory and every parent directory above it,
+ * then (if not already covered by that walk) the file's project base
+ * directory, then (if still not covered) the Eclipse workspace root -
+ * the nearest-wins search clang-format itself does for "-style=file",
+ * but resolved explicitly so it doesn't depend on the spawned process's
+ * working directory, and resilient to linked resources or projects that
+ * live outside the workspace root.
  */
 public final class ClangFormatStyleResolver {
 
@@ -24,34 +27,53 @@ public final class ClangFormatStyleResolver {
     /**
      * @param startDir      directory to start searching from (typically the
      *                      edited file's own parent directory); may be null
-     * @param workspaceRoot the Eclipse workspace root directory; the search
-     *                      always also checks this directory even if
-     *                      startDir lies outside it; may be null
-     * @return the nearest .clang-format file found, or null if none exists
-     *         anywhere between startDir and workspaceRoot
+     * @param projectDir    the base directory of the file's enclosing
+     *                      project; always checked explicitly even if
+     *                      startDir doesn't happen to be nested under it
+     *                      (e.g. linked resources); may be null
+     * @param workspaceRoot the Eclipse workspace root directory; always
+     *                      checked explicitly too, even if the project
+     *                      lives outside it; may be null
+     * @return the nearest .clang-format file found, searching in order:
+     *         startDir and its ancestors (up to whichever of projectDir /
+     *         workspaceRoot contains it), then projectDir itself, then
+     *         workspaceRoot itself - or null if none exists anywhere in
+     *         that chain
      */
-    public static File findClangFormatFile(File startDir, File workspaceRoot) {
+    public static File findClangFormatFile(File startDir, File projectDir, File workspaceRoot) {
         File start = canonical(startDir);
-        File boundary = canonical(workspaceRoot);
+        File project = canonical(projectDir);
+        File workspace = canonical(workspaceRoot);
 
         List<File> toCheck = new ArrayList<>();
-        boolean startUnderBoundary = boundary != null && start != null && isAncestor(boundary, start);
 
-        if (startUnderBoundary) {
-            File dir = start;
-            while (dir != null) {
-                toCheck.add(dir);
-                if (dir.equals(boundary)) {
-                    break;
-                }
-                dir = dir.getParentFile();
-            }
-        } else if (start != null) {
-            toCheck.add(start);
+        File boundary = null;
+        if (workspace != null && start != null && isAncestor(workspace, start)) {
+            boundary = workspace;
+        } else if (project != null && start != null && isAncestor(project, start)) {
+            boundary = project;
         }
 
-        if (boundary != null && !toCheck.contains(boundary)) {
-            toCheck.add(boundary);
+        if (start != null) {
+            if (boundary != null) {
+                File dir = start;
+                while (dir != null) {
+                    toCheck.add(dir);
+                    if (dir.equals(boundary)) {
+                        break;
+                    }
+                    dir = dir.getParentFile();
+                }
+            } else {
+                toCheck.add(start);
+            }
+        }
+
+        if (project != null && !toCheck.contains(project)) {
+            toCheck.add(project);
+        }
+        if (workspace != null && !toCheck.contains(workspace)) {
+            toCheck.add(workspace);
         }
 
         for (File dir : toCheck) {
