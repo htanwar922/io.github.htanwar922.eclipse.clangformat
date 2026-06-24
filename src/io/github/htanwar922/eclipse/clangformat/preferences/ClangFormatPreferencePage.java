@@ -10,7 +10,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import io.github.htanwar922.eclipse.clangformat.Activator;
 
 /**
- * Window > Preferences > Clang-Format
+ * Window > Preferences > C/C++ > Code Style > Formatters > Clang-Format
  */
 public class ClangFormatPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 

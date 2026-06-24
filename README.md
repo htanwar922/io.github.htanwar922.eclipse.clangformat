@@ -64,16 +64,18 @@ into your Eclipse installation's `dropins/` folder (create it next to
 
 ## Configuration
 
-`Window > Preferences > Clang-Format`:
+`Window > Preferences > C/C++ > Code Style > Formatters > Clang-Format`:
 
 - **Clang-format executable path** - absolute path, or just
   `clang-format` if it's on PATH.
 - **Additional arguments** - defaults to `-style=file` (uses the
   nearest `.clang-format`). Anything clang-format accepts works here,
-  e.g. `-style=Google`.
+  e.g. `-style=Google` or `-style=LLVM`.
 - **Format entire file when there is no text selection** - on by
   default; uncheck to format only the current line when nothing is
   selected.
+
+*Note: The plugin is intentionally kept as a dependent of C/C++ CDT UI plugin, and may fail to function without the latter.*
 
 ## Default keybindings
 
@@ -82,7 +84,7 @@ into your Eclipse installation's `dropins/` folder (create it next to
 | Format with clang-format       | `Ctrl+Alt+F`  |
 | Toggle Aligned Line Comment    | `Ctrl+/`  |
 
-(`Cmd+Option+...` on macOS.) Both are scoped to the "C/C++ Editing"
+(`Cmd+Option+F` and `Cmd+/` on macOS.) Both are scoped to the "C/C++ Editing"
 context, so they only fire with a text editor focused. Rebind via
 `Window > Preferences > General > Keys` if either clashes with something
 on your setup.

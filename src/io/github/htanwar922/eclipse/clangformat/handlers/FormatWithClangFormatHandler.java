@@ -87,7 +87,8 @@ public class FormatWithClangFormatHandler extends AbstractHandler {
         if (execPath == null || execPath.trim().isEmpty()) {
             MessageDialog.openWarning(Display.getDefault().getActiveShell(),
                     "Clang-Format Not Configured",
-                    "Please set the clang-format executable path in Window > Preferences > Clang-Format.");
+                    "Please set the clang-format executable path in Window > Preferences > C/C++ >"
+                            + " Code Style > Formatters > Clang-Format.");
             return null;
         }
 
@@ -121,8 +122,8 @@ public class FormatWithClangFormatHandler extends AbstractHandler {
                                 + "directory, the project's base directory, or the workspace root.\n\n"
                                 + "Formatting was skipped to avoid applying an unintended default "
                                 + "style. Add a .clang-format file, or set an explicit style "
-                                + "(e.g. -style=LLVM) under Window > Preferences > Clang-Format > "
-                                + "Additional arguments.");
+                                + "(e.g. -style=LLVM) under Window > Preferences > C/C++ > Code Style >"
+                                + " Formatters > Clang-Format > Additional arguments.");
                 return null;
             }
             extraArgs = ClangFormatStyleResolver.withExplicitStyleFile(extraArgs, clangFormatFile);

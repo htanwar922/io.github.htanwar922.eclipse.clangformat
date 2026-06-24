@@ -81,7 +81,8 @@
       <page
             id="io.github.htanwar922.eclipse.clangformat.preferences.ClangFormatPreferencePage"
             name="Clang-Format"
-            class="io.github.htanwar922.eclipse.clangformat.preferences.ClangFormatPreferencePage">
+            class="io.github.htanwar922.eclipse.clangformat.preferences.ClangFormatPreferencePage"
+            category="org.eclipse.cdt.ui.preferences.CodeFormatterPreferencePage">
       </page>
    </extension>
 

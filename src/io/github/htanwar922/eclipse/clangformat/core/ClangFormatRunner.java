@@ -70,7 +70,8 @@ public final class ClangFormatRunner {
             process = pb.start();
         } catch (IOException e) {
             throw new FormatException("Could not launch clang-format at '" + executablePath
-                    + "'. Check the path in Window > Preferences > Clang-Format.\n" + e.getMessage());
+                    + "'. Check the path in Window > Preferences > C/C++ >"
+                    + " Code Style > Formatters > Clang-Format.\n" + e.getMessage());
         }
 
         StringBuilder stdout = new StringBuilder();
