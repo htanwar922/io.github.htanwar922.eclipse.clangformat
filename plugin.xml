@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <!-- ===================== Commands ===================== -->
+   <extension point="org.eclipse.ui.commands">
+      <command
+            id="io.github.htanwar922.eclipse.clangformat.commands.formatWithClangFormat"
+            name="Format with clang-format"
+            description="Formats the active file (or selection) using the configured clang-format executable"
+            categoryId="org.eclipse.ui.category.edit">
+      </command>
+      <command
+            id="io.github.htanwar922.eclipse.clangformat.commands.toggleAlignedComment"
+            name="Toggle Aligned Line Comment"
+            description="Toggles // line comments, aligned to the lowest indentation level of the selected lines"
+            categoryId="org.eclipse.ui.category.edit">
+      </command>
+   </extension>
+
+   <!-- ===================== Handlers ===================== -->
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            commandId="io.github.htanwar922.eclipse.clangformat.commands.formatWithClangFormat"
+            class="io.github.htanwar922.eclipse.clangformat.handlers.FormatWithClangFormatHandler">
+      </handler>
+      <handler
+            commandId="io.github.htanwar922.eclipse.clangformat.commands.toggleAlignedComment"
+            class="io.github.htanwar922.eclipse.clangformat.handlers.ToggleAlignedCommentHandler">
+      </handler>
+   </extension>
+
+   <!-- ===================== Key bindings ===================== -->
+   <!-- M1 = Ctrl (Cmd on macOS), M3 = Alt (Option on macOS). Rebind freely via
+        Window > Preferences > General > Keys if these clash with anything. -->
+   <extension point="org.eclipse.ui.bindings">
+      <key
+            commandId="io.github.htanwar922.eclipse.clangformat.commands.formatWithClangFormat"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+F">
+      </key>
+      <key
+            commandId="io.github.htanwar922.eclipse.clangformat.commands.toggleAlignedComment"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+/">
+      </key>
+   </extension>
+
+   <!-- ===================== Menus ===================== -->
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="menu:edit?after=additions">
+         <command
+               commandId="io.github.htanwar922.eclipse.clangformat.commands.formatWithClangFormat"
+               label="Format with clang-format"
+               style="push">
+         </command>
+         <command
+               commandId="io.github.htanwar922.eclipse.clangformat.commands.toggleAlignedComment"
+               label="Toggle Aligned Line Comment"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution locationURI="popup:#TextEditorContext?after=additions">
+         <command
+               commandId="io.github.htanwar922.eclipse.clangformat.commands.formatWithClangFormat"
+               label="Format with clang-format"
+               style="push">
+         </command>
+         <command
+               commandId="io.github.htanwar922.eclipse.clangformat.commands.toggleAlignedComment"
+               label="Toggle Aligned Line Comment"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+
+   <!-- ===================== Preferences ===================== -->
+   <extension point="org.eclipse.ui.preferencePages">
+      <page
+            id="io.github.htanwar922.eclipse.clangformat.preferences.ClangFormatPreferencePage"
+            name="Clang-Format"
+            class="io.github.htanwar922.eclipse.clangformat.preferences.ClangFormatPreferencePage">
+      </page>
+   </extension>
+
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="io.github.htanwar922.eclipse.clangformat.preferences.PreferenceInitializer"/>
+   </extension>
+
+</plugin>
