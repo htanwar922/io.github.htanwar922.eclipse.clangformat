@@ -80,9 +80,9 @@ into your Eclipse installation's `dropins/` folder (create it next to
 | Command                       | Default       |
 |--------------------------------|---------------|
 | Format with clang-format       | `Ctrl+Alt+F`  |
-| Toggle Aligned Line Comment    | `Ctrl+Alt+/`  |
+| Toggle Aligned Line Comment    | `Ctrl+/`  |
 
-(`Cmd+Option+...` on macOS.) Both are scoped to the "Editing Text"
+(`Cmd+Option+...` on macOS.) Both are scoped to the "C/C++ Editing"
 context, so they only fire with a text editor focused. Rebind via
 `Window > Preferences > General > Keys` if either clashes with something
 on your setup.
@@ -141,12 +141,14 @@ Toggling again on any of the above restores the original text exactly
 (it strips `//` plus one following space, nothing else).
 
 **Rules for mixed/edge cases:**
-- Blank (whitespace-only) lines are skipped entirely - not commented,
-  not used when computing the minimum indentation.
+- Blank (whitespace-only) lines are always skipped entirely - not
+  commented, not used when computing the minimum indentation.
 - If the selection has a mix of commented and uncommented lines, the
-  action is "comment": already-commented lines are left untouched
-  (no double-commenting), uncommented ones get `// ` added at the
-  selection's minimum indentation.
+  action is "comment": **every** non-blank line gets a fresh `// `
+  prepended, including ones that already start with `//` - they end up
+  double-marked (e.g. `// // foo();`), matching VS Code. Toggling again
+  strips exactly one `//` layer per line, so a double-marked line is
+  restored to its original single comment rather than losing it.
 - Uncomment only triggers when *every* non-blank selected line is
   already commented.
 - Indentation is measured in raw characters (tabs count as 1, same as

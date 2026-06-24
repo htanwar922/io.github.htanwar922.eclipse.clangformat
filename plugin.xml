@@ -36,15 +36,15 @@
    <extension point="org.eclipse.ui.bindings">
       <key
             commandId="io.github.htanwar922.eclipse.clangformat.commands.formatWithClangFormat"
-            contextId="org.eclipse.ui.textEditorScope"
+            contextId="org.eclipse.cdt.ui.cEditorScope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M3+F">
       </key>
       <key
             commandId="io.github.htanwar922.eclipse.clangformat.commands.toggleAlignedComment"
-            contextId="org.eclipse.ui.textEditorScope"
+            contextId="org.eclipse.cdt.ui.cEditorScope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M3+/">
+            sequence="M1+/">
       </key>
    </extension>
 

@@ -35,10 +35,14 @@ import org.eclipse.jface.text.ITextSelection;
  *    computing the minimum indentation.
  *
  * 5. If a selection mixes commented and uncommented lines, the action is
- *    "comment" (added at the shared minimum-indent column); lines that
- *    are already commented are left as-is rather than double-commented.
- *    Only when EVERY non-blank line is already commented does the action
- *    become "uncomment".
+ *    "comment": every non-blank line gets a fresh "// " prepended at the
+ *    shared minimum-indent column, INCLUDING lines that already start
+ *    with "//" (so they end up double-marked, e.g. "// // foo();") -
+ *    matching VS Code's behavior. Only when EVERY non-blank line is
+ *    already commented does the action become "uncomment" instead.
+ *    Because uncomment always strips exactly one "//" layer, toggling
+ *    on a double-marked line restores its original single "//" rather
+ *    than losing it.
  *
  * Indentation is measured in raw characters (spaces and tabs count as one
  * column each). This lines up correctly as long as a block uses a
@@ -126,8 +130,6 @@ public final class CommentToggler {
                 newLine = line;
             } else if (uncomment) {
                 newLine = removeComment(line, indent);
-            } else if (isCommented(line, indent)) {
-                newLine = line; // already commented - don't double it up
             } else {
                 newLine = insertCommentAt(line, minIndent);
             }
