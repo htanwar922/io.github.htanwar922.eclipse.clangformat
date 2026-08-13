@@ -16,6 +16,10 @@
       [Enter License Description here.]
    </license>
 
+   <url>
+      <update label="Clang-Format" url="https://htanwar922.github.io/io.github.htanwar922.eclipse.clangformat/"/>
+   </url>
+
    <plugin
          id="io.github.htanwar922.eclipse.clangformat"
          version="0.0.0"/>
