@@ -1,60 +1,46 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>io.github.htanwar922.eclipse.clangformat.site</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<style>@import url("web/site.css");</style>
-<script type="text/javascript">
-	var returnval = 0;
-	var stylesheet, xmlFile, cache, doc;
-	function init(){
-		// NSCP 7.1+ / Mozilla 1.4.1+ / Safari
-		// Use the standard DOM Level 2 technique, if it is supported
-		if (document.implementation && document.implementation.createDocument) {
-			xmlFile = document.implementation.createDocument("", "", null);
-			stylesheet = document.implementation.createDocument("", "", null);
-			if (xmlFile.load){
-				xmlFile.load("site.xml");
-				stylesheet.load("web/site.xsl");
-			} else {
-				alert("Document could not be loaded by browser.");
-			}
-			xmlFile.addEventListener("load", transform, false);
-			stylesheet.addEventListener("load", transform, false);
-		}
-		//IE 6.0+ solution
-		else if (window.ActiveXObject) {
-			xmlFile = new ActiveXObject("msxml2.DOMDocument.3.0");
-			xmlFile.async = false;
-			xmlFile.load("site.xml");
-			stylesheet = new ActiveXObject("msxml2.FreeThreadedDOMDocument.3.0");
-			stylesheet.async = false;
-			stylesheet.load("web/site.xsl");
-			cache = new ActiveXObject("msxml2.XSLTemplate.3.0");
-			cache.stylesheet = stylesheet;
-			transformData();
-		}
-	}
-	// separate transformation function for IE 6.0+
-	function transformData(){
-		var processor = cache.createProcessor();
-		processor.input = xmlFile;
-		processor.transform();
-		data.innerHTML = processor.output;
-	}
-	// separate transformation function for NSCP 7.1+ and Mozilla 1.4.1+ 
-	function transform(){
-		returnval+=1;
-		if (returnval==2){
-			var processor = new XSLTProcessor();
-			processor.importStylesheet(stylesheet); 
-			doc = processor.transformToDocument(xmlFile);
-			document.getElementById("data").innerHTML = doc.documentElement.innerHTML;
-		}
-	}
-</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clang-Format Aligned Comment Toggler - Eclipse Update Site</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #333;
+        }
+        h1 { color: #0056b3; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .box {
+            background: #f8f9fa;
+            border-left: 4px solid #0056b3;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        code { background: #e9ecef; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+        ol { padding-left: 20px; }
+    </style>
 </head>
-<body onload="init();">
-<!--[insert static HTML here]-->
-<div id="data"><!-- this is where the transformed data goes --></div>
+<body>
+    <h1>Clang-Format Aligned Comment Toggler</h1>
+    <p>This is the official Eclipse Update Site for the <strong>Clang-Format Aligned Comment Toggler</strong> plugin.</p>
+
+    <div class="box">
+        <h3>How to Install in Eclipse</h3>
+        <ol>
+            <li>In Eclipse, go to <strong>Help &gt; Install New Software...</strong></li>
+            <li>Copy and paste this page's URL into the <strong>Work with:</strong> field:<br>
+                <code>https://htanwar922.github.io/io.github.htanwar922.eclipse.clangformat/</code>
+            </li>
+            <li>Press <strong>Enter</strong>, check the box next to <strong>C/C++ Formatting Tools</strong>, and click <strong>Next</strong>.</li>
+            <li>Follow the on-screen prompts to complete installation and restart Eclipse.</li>
+        </ol>
+    </div>
+
+    <p>For source code, issue tracking, and documentation, visit the <a href="https://github.com/htanwar922/io.github.htanwar922.eclipse.clangformat">GitHub Repository</a>.</p>
 </body>
 </html>
