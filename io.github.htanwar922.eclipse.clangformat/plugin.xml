@@ -8,13 +8,13 @@
             id="io.github.htanwar922.eclipse.clangformat.commands.formatWithClangFormat"
             name="Format with clang-format"
             description="Formats the active file (or selection) using the configured clang-format executable"
-            categoryId="org.eclipse.ui.category.edit">
+            categoryId="org.eclipse.cdt.ui.category.source">
       </command>
       <command
             id="io.github.htanwar922.eclipse.clangformat.commands.toggleAlignedComment"
             name="Toggle Aligned Line Comment"
             description="Toggles // line comments, aligned to the lowest indentation level of the selected lines"
-            categoryId="org.eclipse.ui.category.edit">
+            categoryId="org.eclipse.cdt.ui.category.source">
       </command>
    </extension>
 
