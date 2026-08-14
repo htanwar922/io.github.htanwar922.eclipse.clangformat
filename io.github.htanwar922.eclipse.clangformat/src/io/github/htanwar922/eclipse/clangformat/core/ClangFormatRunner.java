@@ -105,10 +105,19 @@ public final class ClangFormatRunner {
 
         int exitCode;
         try {
-            stdoutReader.join();
-            stderrReader.join();
-            exitCode = process.waitFor();
+            // Wait a maximum of 10 seconds for clang-format to finish
+            boolean finished = process.waitFor(10, java.util.concurrent.TimeUnit.SECONDS);
+
+            if (!finished) {
+                process.destroyForcibly();
+                throw new FormatException("clang-format timed out after 10 seconds and was terminated.");
+            }
+
+            stdoutReader.join(1000);
+            stderrReader.join(1000);
+            exitCode = process.exitValue();
         } catch (InterruptedException e) {
+            process.destroyForcibly();
             Thread.currentThread().interrupt();
             throw new FormatException("Formatting was interrupted.");
         }
