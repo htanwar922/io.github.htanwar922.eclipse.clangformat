@@ -11,7 +11,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     public void initializeDefaultPreferences() {
         IPreferenceStore store = Activator.getDefault().getPreferenceStore();
         store.setDefault(PreferenceConstants.CLANG_FORMAT_PATH, "clang-format");
-        store.setDefault(PreferenceConstants.CLANG_FORMAT_ARGS, "-style=file");
+        store.setDefault(PreferenceConstants.CLANG_FORMAT_STYLE, "");
+        store.setDefault(PreferenceConstants.CLANG_FORMAT_ARGS, "");
         store.setDefault(PreferenceConstants.FORMAT_WHOLE_FILE_WHEN_NO_SELECTION, true);
     }
 }

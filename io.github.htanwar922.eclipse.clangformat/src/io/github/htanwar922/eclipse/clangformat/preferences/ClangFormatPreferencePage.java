@@ -1,6 +1,7 @@
 package io.github.htanwar922.eclipse.clangformat.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -13,6 +14,18 @@ import io.github.htanwar922.eclipse.clangformat.Activator;
  * Window > Preferences > C/C++ > Code Style > Formatters > Clang-Format
  */
 public class ClangFormatPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+
+    protected String[][] styleOptions = new String[][] {
+        { "Default", "" },
+        { "File (.clang-format)", "-style=file" },
+        { "LLVM", "-style=LLVM" },
+        { "Google", "-style=Google" },
+        { "Chromium", "-style=Chromium" },
+        { "Mozilla", "-style=Mozilla" },
+        { "WebKit", "-style=WebKit" },
+        { "Microsoft", "-style=Microsoft" },
+        { "GNU", "-style=GNU" }
+    };
 
     public ClangFormatPreferencePage() {
         super(GRID);
@@ -27,6 +40,13 @@ public class ClangFormatPreferencePage extends FieldEditorPreferencePage impleme
                 "Clang-format executable path:",
                 true,
                 getFieldEditorParent()));
+
+        addField(new ComboFieldEditor(
+            PreferenceConstants.CLANG_FORMAT_STYLE, // We are reusing your existing preference key
+            "Formatting Style:",
+            styleOptions,
+            getFieldEditorParent()
+        ));
 
         addField(new StringFieldEditor(
                 PreferenceConstants.CLANG_FORMAT_ARGS,

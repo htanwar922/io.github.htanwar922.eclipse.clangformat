@@ -94,7 +94,7 @@ public final class ClangFormatStyleResolver {
     public static boolean usesFileStyle(String extraArgs) {
         String value = extractStyleValue(extraArgs);
         if (value == null) {
-            return true;
+            return false;
         }
         return value.equals("file") || value.startsWith("file:");
     }

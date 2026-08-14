@@ -2,7 +2,8 @@
 <feature
       id="io.github.htanwar922.eclipse.clangformat.feature"
       label="Clang-Format plugin for Eclipse"
-      version="1.0.1.qualifier">
+      version="1.0.2.qualifier"
+      os="linux,macosx,win32">
 
    <description url="http://www.example.com/description">
       Support for clang-format and VS Code-like comments in C/C++ Source Code.
