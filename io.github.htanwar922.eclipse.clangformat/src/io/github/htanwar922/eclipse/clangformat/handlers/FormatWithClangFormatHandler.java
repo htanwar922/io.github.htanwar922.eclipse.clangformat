@@ -17,8 +17,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.DocumentRewriteSession;
+import org.eclipse.jface.text.DocumentRewriteSessionType;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Display;
@@ -31,6 +36,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import io.github.htanwar922.eclipse.clangformat.Activator;
 import io.github.htanwar922.eclipse.clangformat.core.ClangFormatRunner;
 import io.github.htanwar922.eclipse.clangformat.core.ClangFormatRunner.FormatException;
+import io.github.htanwar922.eclipse.clangformat.core.ClangFormatRunner.FormatResult;
 import io.github.htanwar922.eclipse.clangformat.core.ClangFormatStyleResolver;
 import io.github.htanwar922.eclipse.clangformat.preferences.PreferenceConstants;
 
@@ -73,6 +79,14 @@ public class FormatWithClangFormatHandler extends AbstractHandler {
             startLine = line;
             endLine = line;
         }
+
+        // Save the cursor's current line (fallback) and exact character offset
+        final int savedLine = (selection != null) ? selection.getStartLine() : 0;
+        final Integer savedOffset = (selection != null) ? selection.getOffset() : null;
+        final int savedLength = (selection != null) ? selection.getLength() : 0;
+
+        // The exact number of characters AFTER our highlight range
+        final int suffixLength = document.getLength() - (savedOffset + savedLength);
 
         // IEditorInput.getName() already returns just the file name (e.g. "Foo.c"),
         // which is all clang-format needs from -assume-filename for language detection.
@@ -163,11 +177,55 @@ public class FormatWithClangFormatHandler extends AbstractHandler {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    String formatted = ClangFormatRunner.format(
-                            fExecPath, fExtraArgs, fFileNameHint, sourceText, fStartLine, fEndLine, fWorkingDir);
+                    FormatResult result = ClangFormatRunner.format(
+                            fExecPath, fExtraArgs, fFileNameHint, sourceText, fStartLine, fEndLine, fWorkingDir, savedOffset);
+
                     Display.getDefault().asyncExec(() -> {
-                        if (!formatted.equals(sourceText)) {
-                            document.set(formatted);
+                        if (!result.formattedText.equals(sourceText)) {
+                            DocumentRewriteSession session = null;
+                            IDocumentExtension4 doc4 = (document instanceof IDocumentExtension4)
+                                    ? (IDocumentExtension4) document : null;
+
+                            try {
+                                if (doc4 != null) {
+                                    // Group changes into 1 Undo step and prevent IDE UI freezes
+                                    session = doc4.startRewriteSession(DocumentRewriteSessionType.SEQUENTIAL);
+                                }
+                                document.set(result.formattedText);
+                            } finally {
+                                if (doc4 != null && session != null) {
+                                    doc4.stopRewriteSession(session);
+                                }
+                            }
+
+                            // Restore the cursor position
+                            if (selProvider != null) {
+                                if (result.newCursorOffset >= 0) {
+                                    int finalOffset = result.newCursorOffset;
+                                    int finalLength = 0;
+
+                                    if (savedLength > 0) {
+                                        // Because the suffix wasn't formatted, its length is identical.
+                                        // We just subtract it from the new doc length to find the new end!
+                                        int newEndOffset = document.getLength() - suffixLength;
+                                        finalLength = Math.max(0, newEndOffset - finalOffset);
+                                    }
+
+                                    // Final safety bounds to prevent any BadLocationExceptions
+                                    finalOffset = Math.min(finalOffset, document.getLength());
+                                    finalLength = Math.min(finalLength, document.getLength() - finalOffset);
+
+                                    selProvider.setSelection(new TextSelection(finalOffset, finalLength));
+
+                                } else {
+                                    // Fallback to the old line-based approach if cursor tracking failed
+                                    try {
+                                        int safeLine = Math.min(savedLine, document.getNumberOfLines() - 1);
+                                        int lineOffset = document.getLineOffset(safeLine);
+                                        selProvider.setSelection(new TextSelection(lineOffset, 0));
+                                    } catch (BadLocationException ignored) {}
+                                }
+                            }
                         }
                     });
                     return Status.OK_STATUS;
