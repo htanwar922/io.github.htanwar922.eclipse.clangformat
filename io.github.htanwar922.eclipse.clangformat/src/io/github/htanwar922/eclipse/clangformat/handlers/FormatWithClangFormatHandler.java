@@ -1,6 +1,7 @@
 package io.github.htanwar922.eclipse.clangformat.handlers;
 
 import java.io.File;
+import java.net.URI;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -83,8 +84,7 @@ public class FormatWithClangFormatHandler extends AbstractHandler {
 
         String execPath = store.getString(PreferenceConstants.CLANG_FORMAT_PATH);
         String formatStyle = store.getString(PreferenceConstants.CLANG_FORMAT_STYLE);
-        String extraArgs = store.getString(PreferenceConstants.CLANG_FORMAT_ARGS);
-        extraArgs += formatStyle;
+        String extraArgs = formatStyle + " " + store.getString(PreferenceConstants.CLANG_FORMAT_ARGS);
 
         if (execPath == null || execPath.trim().isEmpty()) {
             MessageDialog.openWarning(Display.getDefault().getActiveShell(),
@@ -101,19 +101,38 @@ public class FormatWithClangFormatHandler extends AbstractHandler {
         IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
         File workspaceRootDir = (wsRoot.getLocation() != null) ? wsRoot.getLocation().toFile() : null;
 
-        File startDir = workspaceRootDir;
+        File fileDir = null;
         File projectDir = null;
+
         IFile workspaceFile = input.getAdapter(IFile.class);
         if (workspaceFile != null) {
             IPath location = workspaceFile.getLocation();
             if (location != null) {
-                startDir = location.toFile().getParentFile();
+                fileDir = location.toFile().getParentFile();
             }
             IProject project = workspaceFile.getProject();
             if (project != null && project.getLocation() != null) {
                 projectDir = project.getLocation().toFile();
             }
+        } else {
+            // Fallback for external files (like FileStoreEditorInput) without needing extra dependencies
+            try {
+                URI uri = input.getAdapter(URI.class);
+                if (uri == null) {
+                    // Safely invoke getURI() dynamically if the adapter isn't registered
+                    java.lang.reflect.Method method = input.getClass().getMethod("getURI");
+                    uri = (URI) method.invoke(input);
+                }
+
+                if (uri != null && "file".equalsIgnoreCase(uri.getScheme())) {
+                    fileDir = new File(uri).getParentFile();
+                }
+            } catch (Exception e) {
+                // Ignore: This is a virtual in-memory file with no physical disk location
+            }
         }
+
+        File startDir = (fileDir != null) ? fileDir : workspaceRootDir;
 
         if (ClangFormatStyleResolver.usesFileStyle(extraArgs)) {
             File clangFormatFile = ClangFormatStyleResolver.findClangFormatFile(startDir, projectDir, workspaceRootDir);
@@ -129,6 +148,7 @@ public class FormatWithClangFormatHandler extends AbstractHandler {
                 return null;
             }
             extraArgs = ClangFormatStyleResolver.withExplicitStyleFile(extraArgs, clangFormatFile);
+            extraArgs += " -fallback-style=None";
         }
 
         String sourceText = document.get();
