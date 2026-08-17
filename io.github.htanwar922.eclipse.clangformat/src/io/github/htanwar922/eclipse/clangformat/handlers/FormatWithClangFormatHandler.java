@@ -191,6 +191,36 @@ public class FormatWithClangFormatHandler extends AbstractHandler {
                                     // Group changes into 1 Undo step and prevent IDE UI freezes
                                     session = doc4.startRewriteSession(DocumentRewriteSessionType.SEQUENTIAL);
                                 }
+
+                                // =====================================================================
+                                // SMART REPLACE: Find the exact diff so Ctrl+Z only highlights the change
+                                // =====================================================================
+                                String oldText = sourceText;
+                                String newText = result.formattedText;
+
+                                int prefix = 0;
+                                int maxPrefix = Math.min(oldText.length(), newText.length());
+                                while (prefix < maxPrefix && oldText.charAt(prefix) == newText.charAt(prefix)) {
+                                    prefix++;
+                                }
+
+                                int suffix = 0;
+                                int maxSuffix = Math.min(oldText.length() - prefix, newText.length() - prefix);
+                                while (suffix < maxSuffix &&
+                                       oldText.charAt(oldText.length() - 1 - suffix) == newText.charAt(newText.length() - 1 - suffix)) {
+                                    suffix++;
+                                }
+
+                                int replaceOffset = prefix;
+                                int replaceLength = oldText.length() - prefix - suffix;
+                                String replacementText = newText.substring(prefix, newText.length() - suffix);
+
+                                // Only replace the specific block that actually changed!
+                                document.replace(replaceOffset, replaceLength, replacementText);
+                                // =====================================================================
+
+                            } catch (Exception e) {
+                                // Fallback just in case the math fails
                                 document.set(result.formattedText);
                             } finally {
                                 if (doc4 != null && session != null) {
