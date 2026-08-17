@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Clang-Format Integration
 Bundle-SymbolicName: io.github.htanwar922.eclipse.clangformat;singleton:=true
-Bundle-Version: 1.0.6.qualifier
+Bundle-Version: 1.1.0.qualifier
 Bundle-Activator: io.github.htanwar922.eclipse.clangformat.Activator
 Bundle-Vendor: htanwar922
 Bundle-RequiredExecutionEnvironment: JavaSE-17

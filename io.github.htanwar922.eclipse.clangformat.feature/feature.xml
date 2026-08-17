@@ -2,7 +2,7 @@
 <feature
       id="io.github.htanwar922.eclipse.clangformat.feature"
       label="Clang-Format plugin for Eclipse"
-      version="1.0.6.qualifier"
+      version="1.1.0.qualifier"
       provider-name="htanwar922"
       plugin="io.github.htanwar922.eclipse.clangformat"
       os="linux,macosx,win32">
